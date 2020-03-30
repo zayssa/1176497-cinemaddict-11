@@ -1,7 +1,7 @@
 # Личный проект «Киноман» [![Build status][travis-image]][travis-url]
 
-* Студент: [Марина Петрова](https://up.htmlacademy.ru/ecmascript/11/user/1176497).
-* Наставник: `Неизвестно`.
+- Студент: [Марина Петрова](https://up.htmlacademy.ru/ecmascript/11/user/1176497).
+- Наставник: [Александр Малинов](https://htmlacademy.ru/profile/id40204).
 
 ---
 
