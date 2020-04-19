@@ -111,9 +111,9 @@ const generateMovie = () => {
   film.restriction = getRandomArrayElements(restrictions)[0];
   film.description = getRandomArrayElements(descriptions, 1, 4).join(` `);
   film.comments = getRandomArrayElements(comments, 0, 10);
-  film.watchlist = Math.random() > 0.5;
-  film.history = Math.random() > 0.8;
-  film.favorite = Math.random() > 0.7;
+  film.isWatchlist = Math.random() > 0.5;
+  film.isHistory = Math.random() > 0.8;
+  film.isFavorite = Math.random() > 0.7;
 
   return film;
 };
