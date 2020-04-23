@@ -1,4 +1,8 @@
-export const createSiteMenuTemplate = (watchlist, history, favorites) => {
+import {createElement} from './utils';
+
+export const createSiteMenuTemplate = (data) => {
+  const [watchlist, history, favorites] = data;
+
   return (
     `<nav class="main-navigation">
       <div class="main-navigation__items">
@@ -11,3 +15,26 @@ export const createSiteMenuTemplate = (watchlist, history, favorites) => {
     </nav>`
   );
 };
+
+export default class SiteMenu {
+  constructor(props) {
+    this._data = props;
+    this._element = null;
+  }
+
+  getTemplate() {
+    return createSiteMenuTemplate(this._data);
+  }
+
+  getElement() {
+    if (!this._element) {
+      this._element = createElement(this.getTemplate());
+    }
+
+    return this._element;
+  }
+
+  removeElement() {
+    this._element = null;
+  }
+}
