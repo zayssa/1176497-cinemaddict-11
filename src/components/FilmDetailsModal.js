@@ -143,6 +143,8 @@ const createFilmDetailsModalTemplate = (film) => {
   );
 };
 
+let onEscKeyDown;
+
 export default class FilmDetailsModal {
   constructor(props) {
     this._film = props;
@@ -162,6 +164,15 @@ export default class FilmDetailsModal {
     if (!this._element) {
       this._element = createElement(this.getTemplate());
       this._element.querySelector(`.film-details__close-btn`).addEventListener(`click`, this.closePopUp.bind(this));
+      onEscKeyDown = (evt) => {
+        const isEscKey = evt.key === `Escape` || evt.key === `Esc`;
+
+        if (isEscKey) {
+          this.closePopUp();
+          document.removeEventListener(`keydown`, onEscKeyDown);
+        }
+      };
+      document.addEventListener(`keydown`, onEscKeyDown);
     }
 
     return this._element;
