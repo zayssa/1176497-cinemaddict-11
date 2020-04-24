@@ -7,7 +7,6 @@ import FilmsSort from './components/FilmsSort';
 import FilmsList from './components/FilmsList';
 import FilmCard from './components/FilmCard';
 import ShowMoreButton from './components/ShowMoreButton';
-import SpecialFilmCard from './components/SpecialFilmCard';
 import FooterStats from './components/FooterStats';
 
 const FILM_CARDS = 5;
@@ -50,8 +49,8 @@ const filmMostCommentedListElement = siteMainElement.querySelector(`.films-list-
 const topRatedFilms = [...mock.films.list].sort((a, b) => b.rating - a.rating).slice(0, 2);
 const mostCommentedFilms = [...mock.films.list].sort((a, b) => b.comments.length - a.comments.length).slice(0, 2);
 for (let i = 0; i < FILM_CARDS_SPECIAL; i++) {
-  render(filmTopRatedListElement, new SpecialFilmCard(topRatedFilms[i]));
-  render(filmMostCommentedListElement, new SpecialFilmCard(mostCommentedFilms[i]));
+  render(filmTopRatedListElement, new FilmCard(topRatedFilms[i]));
+  render(filmMostCommentedListElement, new FilmCard(mostCommentedFilms[i]));
 }
 
 const siteFooterStatsElement = document.querySelector(`.footer__statistics`);

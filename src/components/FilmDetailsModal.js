@@ -1,7 +1,7 @@
 import {createElement} from './utils';
 import FilmComments from './FilmComments';
 
-const createFilmDetailesModalTemplate = (film) => {
+const createFilmDetailsModalTemplate = (film) => {
   const {
     poster,
     restriction,
@@ -143,7 +143,7 @@ const createFilmDetailesModalTemplate = (film) => {
   );
 };
 
-export default class FilmDetailesModal {
+export default class FilmDetailsModal {
   constructor(props) {
     this._film = props;
     this._element = null;
@@ -155,7 +155,7 @@ export default class FilmDetailesModal {
   }
 
   getTemplate() {
-    return createFilmDetailesModalTemplate(this._film);
+    return createFilmDetailsModalTemplate(this._film);
   }
 
   getElement() {
