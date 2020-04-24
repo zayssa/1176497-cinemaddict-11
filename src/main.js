@@ -1,59 +1,58 @@
-import {mock} from "./components/mock";
+import {mock} from './components/mock';
+import {render} from './components/utils';
 
-import {createUserRankTemplate} from './components/UserRankTemplate';
-import {createSiteMenuTemplate} from './components/SiteMenuTemplate';
-import {createFilmsSortTemplate} from './components/FilmsSortTemplate';
-import {createFilmsTemplate} from './components/FilmsTemplate';
-import {createFilmCardTemplate} from './components/FilmCardTemplate';
-import {createShowMoreButtonTemplate} from './components/ShowMoreButtonTemplate';
-import {createSpecialFilmCardTemplate} from './components/SpecialFilmCardTemplate';
-import {createFilmDetailesModalTemplate} from './components/FilmDetailesModalTemplat';
-import {createFooterStatsTemplate} from './components/FooterStatsTemplate';
+import UserRank from './components/UserRank';
+import SiteMenu from './components/SiteMenu';
+import FilmsSort from './components/FilmsSort';
+import FilmsList from './components/FilmsList';
+import FilmCard from './components/FilmCard';
+import ShowMoreButton from './components/ShowMoreButton';
+import SpecialFilmCard from './components/SpecialFilmCard';
+import FooterStats from './components/FooterStats';
 
 const FILM_CARDS = 5;
 const FILM_CARDS_SPECIAL = 2;
 
-const render = (container, template, place) => {
-  container.insertAdjacentHTML(place, template);
-};
-
 const siteHeaderElement = document.querySelector(`.header`);
-render(siteHeaderElement, createUserRankTemplate(mock.user.rank, mock.user.userpic), `beforeend`);
+render(siteHeaderElement, new UserRank(mock.user));
 
 const siteMainElement = document.querySelector(`.main`);
-render(siteMainElement, createSiteMenuTemplate(mock.films.list.filter((a) => a.watchlist).length, mock.films.list.filter((a) => a.history).length, mock.films.list.filter((a) => a.favorite).length), `beforeend`);
-render(siteMainElement, createFilmsSortTemplate(), `beforeend`);
-render(siteMainElement, createFilmsTemplate(), `beforeend`);
+const filterParams = [
+  mock.films.list.filter((a) => a.isWatchlist).length,
+  mock.films.list.filter((a) => a.isHistory).length,
+  mock.films.list.filter((a) => a.isFavorite).length
+];
+render(siteMainElement, new SiteMenu(filterParams));
+
+render(siteMainElement, new FilmsSort());
+render(siteMainElement, new FilmsList());
 
 const filmListElement = siteMainElement.querySelector(`.films-list`);
-render(filmListElement, createShowMoreButtonTemplate(), `beforeend`);
-const showMoreButtonTemplate = document.querySelector(`.films-list__show-more`);
+const showMoreButton = new ShowMoreButton();
+render(filmListElement, showMoreButton);
 
 const filmListContainerElement = filmListElement.querySelector(`.films-list__container`);
 let filmsShown = 0;
 const loadMoreFilms = () => {
   for (let i = 0; i < FILM_CARDS && filmsShown < mock.films.list.length; i++) {
-    render(filmListContainerElement, createFilmCardTemplate(mock.films.list[filmsShown]), `beforeend`);
+    render(filmListContainerElement, new FilmCard(mock.films.list[filmsShown]));
     filmsShown++;
   }
   if (filmsShown >= mock.films.list.length) {
-    showMoreButtonTemplate.style.display = `none`;
+    showMoreButton.getElement().style.display = `none`;
   }
 };
 loadMoreFilms();
-showMoreButtonTemplate.addEventListener(`click`, loadMoreFilms);
+showMoreButton.getElement().addEventListener(`click`, loadMoreFilms);
 
 const filmTopRatedListElement = siteMainElement.querySelector(`.films-list--extra .films-list__container`);
 const filmMostCommentedListElement = siteMainElement.querySelector(`.films-list--extra + .films-list--extra .films-list__container`);
 const topRatedFilms = [...mock.films.list].sort((a, b) => b.rating - a.rating).slice(0, 2);
 const mostCommentedFilms = [...mock.films.list].sort((a, b) => b.comments.length - a.comments.length).slice(0, 2);
 for (let i = 0; i < FILM_CARDS_SPECIAL; i++) {
-  render(filmTopRatedListElement, createSpecialFilmCardTemplate(topRatedFilms[i]), `beforeend`);
-  render(filmMostCommentedListElement, createSpecialFilmCardTemplate(mostCommentedFilms[i]), `beforeend`);
+  render(filmTopRatedListElement, new SpecialFilmCard(topRatedFilms[i]));
+  render(filmMostCommentedListElement, new SpecialFilmCard(mostCommentedFilms[i]));
 }
 
 const siteFooterStatsElement = document.querySelector(`.footer__statistics`);
-render(siteFooterStatsElement, createFooterStatsTemplate(mock.films.total), `beforeend`);
-
-const siteBodyElement = document.querySelector(`body`);
-render(siteBodyElement, createFilmDetailesModalTemplate(mock.films.list[0]), `beforeend`);
+render(siteFooterStatsElement, new FooterStats(mock.films.total));
