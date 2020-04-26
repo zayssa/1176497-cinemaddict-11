@@ -1,5 +1,6 @@
-import {createElement, render} from './utils';
+import {createElement, render} from '../utils/render';
 import FilmDetailsModal from './FilmDetailsModal';
+import AbstractComponent from './AbstractComponent';
 
 const createFilmCardTemplate = (film) => {
   const {
@@ -42,10 +43,10 @@ const createFilmCardTemplate = (film) => {
   );
 };
 
-export default class FilmCard {
+export default class FilmCard extends AbstractComponent {
   constructor(props) {
+    super(props);
     this._film = props;
-    this._element = null;
   }
 
   showFilmDetails() {
@@ -66,9 +67,5 @@ export default class FilmCard {
     }
 
     return this._element;
-  }
-
-  removeElement() {
-    this._element = null;
   }
 }
