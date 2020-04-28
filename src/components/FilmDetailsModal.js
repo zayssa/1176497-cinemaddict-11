@@ -1,5 +1,6 @@
-import {createElement} from './utils';
+import {createElement} from '../utils/render';
 import FilmComments from './FilmComments';
+import AbstractComponent from './AbstractComponent';
 
 const createFilmDetailsModalTemplate = (film) => {
   const {
@@ -145,15 +146,10 @@ const createFilmDetailsModalTemplate = (film) => {
 
 let onEscKeyDown;
 
-export default class FilmDetailsModal {
+export default class FilmDetailsModal extends AbstractComponent {
   constructor(props) {
+    super(props);
     this._film = props;
-    this._element = null;
-  }
-
-  closePopUp() {
-    document.querySelector(`.film-details`).remove();
-    this.removeElement();
   }
 
   getTemplate() {
@@ -163,12 +159,12 @@ export default class FilmDetailsModal {
   getElement() {
     if (!this._element) {
       this._element = createElement(this.getTemplate());
-      this._element.querySelector(`.film-details__close-btn`).addEventListener(`click`, this.closePopUp.bind(this));
+      this._element.querySelector(`.film-details__close-btn`).addEventListener(`click`, this.removeElement.bind(this));
       onEscKeyDown = (evt) => {
         const isEscKey = evt.key === `Escape` || evt.key === `Esc`;
 
         if (isEscKey) {
-          this.closePopUp();
+          this.removeElement();
           document.removeEventListener(`keydown`, onEscKeyDown);
         }
       };
@@ -176,9 +172,5 @@ export default class FilmDetailsModal {
     }
 
     return this._element;
-  }
-
-  removeElement() {
-    this._element = null;
   }
 }
