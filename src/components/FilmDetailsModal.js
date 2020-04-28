@@ -1,7 +1,7 @@
 import {createElement} from './utils';
 import FilmComments from './FilmComments';
 
-const createFilmDetailesModalTemplate = (film) => {
+const createFilmDetailsModalTemplate = (film) => {
   const {
     poster,
     restriction,
@@ -143,7 +143,9 @@ const createFilmDetailesModalTemplate = (film) => {
   );
 };
 
-export default class FilmDetailesModal {
+let onEscKeyDown;
+
+export default class FilmDetailsModal {
   constructor(props) {
     this._film = props;
     this._element = null;
@@ -155,13 +157,22 @@ export default class FilmDetailesModal {
   }
 
   getTemplate() {
-    return createFilmDetailesModalTemplate(this._film);
+    return createFilmDetailsModalTemplate(this._film);
   }
 
   getElement() {
     if (!this._element) {
       this._element = createElement(this.getTemplate());
       this._element.querySelector(`.film-details__close-btn`).addEventListener(`click`, this.closePopUp.bind(this));
+      onEscKeyDown = (evt) => {
+        const isEscKey = evt.key === `Escape` || evt.key === `Esc`;
+
+        if (isEscKey) {
+          this.closePopUp();
+          document.removeEventListener(`keydown`, onEscKeyDown);
+        }
+      };
+      document.addEventListener(`keydown`, onEscKeyDown);
     }
 
     return this._element;

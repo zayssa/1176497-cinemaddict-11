@@ -1,6 +1,5 @@
 import {createElement} from './utils';
 
-
 export const createFilmsTemplate = () => {
   return (
     `<section class="films">

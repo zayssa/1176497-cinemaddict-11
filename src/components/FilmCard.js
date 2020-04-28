@@ -1,5 +1,5 @@
 import {createElement, render} from './utils';
-import FilmDetailesModal from './FilmDetailesModal';
+import FilmDetailsModal from './FilmDetailsModal';
 
 const createFilmCardTemplate = (film) => {
   const {
@@ -12,7 +12,7 @@ const createFilmCardTemplate = (film) => {
     description,
     comments,
     isWatchlist,
-    isHistoty,
+    isHistory,
     isFavorite,
   } = film;
 
@@ -35,7 +35,7 @@ const createFilmCardTemplate = (film) => {
       <a class="film-card__comments">${commentsAmount} comments</a>
       <form class="film-card__controls">
         <button class="film-card__controls-item ${isWatchlist ? `film-card__controls-item--active` : ``} button film-card__controls-item--add-to-watchlist">Add to watchlist</button>
-        <button class="film-card__controls-item ${isHistoty ? `film-card__controls-item--active` : ``} button film-card__controls-item--mark-as-watched">Mark as watched</button>
+        <button class="film-card__controls-item ${isHistory ? `film-card__controls-item--active` : ``} button film-card__controls-item--mark-as-watched">Mark as watched</button>
         <button class="film-card__controls-item ${isFavorite ? `film-card__controls-item--active` : ``} button film-card__controls-item--favorite">Mark as favorite</button>
       </form>
     </article>`
@@ -50,7 +50,7 @@ export default class FilmCard {
 
   showFilmDetails() {
     const siteBodyElement = document.querySelector(`body`);
-    render(siteBodyElement, new FilmDetailesModal(this._film));
+    render(siteBodyElement, new FilmDetailsModal(this._film));
   }
 
   getTemplate() {
