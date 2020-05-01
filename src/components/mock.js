@@ -78,12 +78,11 @@ const generateMovie = () => {
   const getRandomComment = () => {
     const emojis = [`angry`, `puke`, `sleeping`, `smile`];
     const phrases = [`Interesting setting and a good cast`, `Booooooooooring`, `Very very old. Meh`, `Almost two hours? Seriously?`];
-    const dates = [`2 days ago`, `Today `, `2019/12/31 23:59`];
     const authors = [`Tim Macoveev`, `John Doe`];
     return {
       emoji: getRandomArrayElements(emojis)[0],
       phrase: getRandomArrayElements(phrases)[0],
-      date: getRandomArrayElements(dates)[0],
+      date: getRandomDate(),
       author: getRandomArrayElements(authors)[0]
     };
   };
