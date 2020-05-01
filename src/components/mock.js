@@ -72,13 +72,7 @@ const generateMovie = () => {
   };
 
   const getRandomDate = () => {
-    const months = [`January`, `February`, `March`, `April`, `May`, `June`, `July`, `August`, `September`, `October`, `November`, `December`];
-    const date = new Date(new Date(1888, 6, 1).getTime() + Math.random() * (new Date().getTime() - new Date(1888, 6, 1).getTime()));
-    let result = `0${date.getDay()}`.slice(-2);
-    result += ` ${months[date.getMonth()]}`;
-    result += ` ${date.getFullYear()}`;
-
-    return result;
+    return new Date(new Date(1888, 6, 1).getTime() + Math.random() * (new Date().getTime() - new Date(1888, 6, 1).getTime()));
   };
 
   const getRandomComment = () => {

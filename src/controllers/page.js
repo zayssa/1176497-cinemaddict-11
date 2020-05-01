@@ -12,35 +12,60 @@ const FILM_CARDS_SPECIAL = 2;
 export default class PageController {
   constructor(container) {
     this._container = container;
+    this._filmsList = new FilmsList();
+    this._showMoreButton = new ShowMoreButton();
+    this._filmsShown = 0;
+  }
+
+  loadMoreFilms(films, container) {
+    for (let i = 0; i < FILM_CARDS && this._filmsShown < films.length; i++) {
+      render(container, new FilmCard(films[this._filmsShown]));
+      this._filmsShown++;
+    }
+    if (this._filmsShown >= films.length) {
+      remove(this._showMoreButton);
+      this._showMoreButton = null;
+    }
   }
 
   render(films) {
-    render(this._container, new FilmsSort());
+    const filmSort = new FilmsSort();
+    render(this._container, filmSort);
 
     if (films.length === 0) {
       render(this._container, new NoFilms());
       return;
     }
 
-    render(this._container, new FilmsList());
-    const filmListElement = this._container.querySelector(`.films-list`);
+    render(this._container, this._filmsList);
+    const filmsListElement = this._filmsList.getElement().querySelector(`.films-list`);
+    const filmsListContainerElement = filmsListElement.querySelector(`.films-list__container`);
 
-    const showMoreButton = new ShowMoreButton();
-    render(filmListElement, showMoreButton);
+    this._showMoreButton = new ShowMoreButton();
+    render(filmsListElement, this._showMoreButton);
 
-    const filmListContainerElement = filmListElement.querySelector(`.films-list__container`);
-    let filmsShown = 0;
-    const loadMoreFilms = () => {
-      for (let i = 0; i < FILM_CARDS && filmsShown < films.length; i++) {
-        render(filmListContainerElement, new FilmCard(films[filmsShown]));
-        filmsShown++;
-      }
-      if (filmsShown >= films.length) {
-        remove(showMoreButton);
-      }
-    };
-    loadMoreFilms();
-    showMoreButton.getElement().addEventListener(`click`, loadMoreFilms);
+    this._showMoreButton.getElement().addEventListener(`click`, this.loadMoreFilms.bind(this, films, filmsListContainerElement));
+    this.loadMoreFilms(films, filmsListContainerElement);
+
+    filmSort.setSortTypeChangeHandler((currentSortType) => {
+      filmsListContainerElement.innerHTML = ``;
+      this._filmsShown = 0;
+      remove(this._showMoreButton);
+
+      this._showMoreButton = new ShowMoreButton();
+      render(filmsListElement, this._showMoreButton);
+
+      const sortedFilms = currentSortType === `default` ? [...films]
+        : [...films].sort((a, b) => {
+          if (currentSortType === `date`) {
+            return a.date - b.date;
+          }
+          return b.rating - a.rating;
+        });
+
+      this._showMoreButton.getElement().addEventListener(`click`, this.loadMoreFilms.bind(this, sortedFilms, filmsListContainerElement));
+      this.loadMoreFilms(sortedFilms, filmsListContainerElement);
+    });
 
     const filmTopRatedElement = this._container.querySelector(`.films-list--extra`);
     const filmMostCommentedElement = this._container.querySelector(`.films-list--extra + .films-list--extra`);
