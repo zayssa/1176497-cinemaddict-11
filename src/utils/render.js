@@ -3,8 +3,10 @@ export const render = (container, component) => {
 };
 
 export const remove = (component) => {
-  component.getElement().remove();
-  component.removeElement();
+  if (component) {
+    component.getElement().remove();
+    component.removeElement();
+  }
 };
 
 export const createElement = (template) => {

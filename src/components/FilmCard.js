@@ -17,7 +17,7 @@ const createFilmCardTemplate = (film) => {
     isFavorite,
   } = film;
 
-  const year = date.slice(-4);
+  const year = date.getFullYear();
   const genresAll = genres.join(`, `);
   const descriptionTrimmed = `${description.slice(0, 140)}${description.length > 140 ? `…` : ``}`;
   const commentsAmount = comments.length;

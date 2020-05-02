@@ -1,5 +1,5 @@
 import AbstractComponent from './AbstractComponent';
-
+import {formatDate} from '../utils/formatters';
 
 export const createFilmCommentsTemplate = (comments) => {
   return (
@@ -13,7 +13,7 @@ export const createFilmCommentsTemplate = (comments) => {
               <p class="film-details__comment-text">${comment.phrase}</p>
               <p class="film-details__comment-info">
                 <span class="film-details__comment-author">${comment.author}</span>
-                <span class="film-details__comment-day">${comment.date}</span>
+                <span class="film-details__comment-day">${formatDate(comment.date)}</span>
                 <button class="film-details__comment-delete">Delete</button>
               </p>
             </div>
