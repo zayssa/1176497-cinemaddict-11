@@ -72,24 +72,17 @@ const generateMovie = () => {
   };
 
   const getRandomDate = () => {
-    const months = [`January`, `February`, `March`, `April`, `May`, `June`, `July`, `August`, `September`, `October`, `November`, `December`];
-    const date = new Date(new Date(1888, 6, 1).getTime() + Math.random() * (new Date().getTime() - new Date(1888, 6, 1).getTime()));
-    let result = `0${date.getDay()}`.slice(-2);
-    result += ` ${months[date.getMonth()]}`;
-    result += ` ${date.getFullYear()}`;
-
-    return result;
+    return new Date(new Date(1888, 6, 1).getTime() + Math.random() * (new Date().getTime() - new Date(1888, 6, 1).getTime()));
   };
 
   const getRandomComment = () => {
     const emojis = [`angry`, `puke`, `sleeping`, `smile`];
     const phrases = [`Interesting setting and a good cast`, `Booooooooooring`, `Very very old. Meh`, `Almost two hours? Seriously?`];
-    const dates = [`2 days ago`, `Today `, `2019/12/31 23:59`];
     const authors = [`Tim Macoveev`, `John Doe`];
     return {
       emoji: getRandomArrayElements(emojis)[0],
       phrase: getRandomArrayElements(phrases)[0],
-      date: getRandomArrayElements(dates)[0],
+      date: getRandomDate(),
       author: getRandomArrayElements(authors)[0]
     };
   };
