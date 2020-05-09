@@ -1,5 +1,3 @@
-import {createElement, render} from '../utils/render';
-import FilmDetailsModal from './FilmDetailsModal';
 import AbstractComponent from './AbstractComponent';
 
 const createFilmCardTemplate = (film) => {
@@ -49,23 +47,25 @@ export default class FilmCard extends AbstractComponent {
     this._film = props;
   }
 
-  showFilmDetails() {
-    const siteBodyElement = document.querySelector(`body`);
-    render(siteBodyElement, new FilmDetailsModal(this._film));
-  }
-
   getTemplate() {
     return createFilmCardTemplate(this._film);
   }
 
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-      this._element.querySelector(`.film-card__title`).addEventListener(`click`, this.showFilmDetails.bind(this));
-      this._element.querySelector(`.film-card__poster`).addEventListener(`click`, this.showFilmDetails.bind(this));
-      this._element.querySelector(`.film-card__comments`).addEventListener(`click`, this.showFilmDetails.bind(this));
-    }
+  addShowFilmDetailsHandler(handler) {
+    this._element.querySelector(`.film-card__title`).addEventListener(`click`, handler);
+    this._element.querySelector(`.film-card__poster`).addEventListener(`click`, handler);
+    this._element.querySelector(`.film-card__comments`).addEventListener(`click`, handler);
+  }
 
-    return this._element;
+  addWatchlistButtonHandler(handler) {
+    this._element.querySelector(`.film-card__controls-item--add-to-watchlist`).addEventListener(`click`, handler);
+  }
+
+  addHistoryButtonHandler(handler) {
+    this._element.querySelector(`.film-card__controls-item--mark-as-watched`).addEventListener(`click`, handler);
+  }
+
+  addFavoriteButtonHandler(handler) {
+    this._element.querySelector(`.film-card__controls-item--favorite`).addEventListener(`click`, handler);
   }
 }

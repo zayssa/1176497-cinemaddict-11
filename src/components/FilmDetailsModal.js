@@ -1,8 +1,9 @@
 import {createElement} from '../utils/render';
 import FilmComments from './FilmComments';
-import AbstractComponent from './AbstractComponent';
+import AbstractSmartComponent from './AbstractSmartComponent';
+import moment from "moment";
 
-const createFilmDetailsModalTemplate = (film) => {
+const createFilmDetailsModalTemplate = (film, state) => {
   const {
     poster,
     restriction,
@@ -23,9 +24,13 @@ const createFilmDetailsModalTemplate = (film) => {
     comments,
   } = film;
 
+  const releaseDate = moment(date).format(`D MMMM YYYY`);
   const genresLabel = `Genre${genres.length > 1 ? `s` : ``}`;
   const genresList = genres.map((genre) => `<span class="film-details__genre">${genre}</span>`).join(``);
   const commentsList = new FilmComments(comments).getTemplate();
+
+  const {currentEmoji, currentText} = state;
+  const currentEmojiElement = currentEmoji ? `<img src="images/emoji/${currentEmoji}.png" width="55" height="55" alt="emoji-${currentEmoji}">` : ``;
 
   return (
     `<section class="film-details">
@@ -68,7 +73,7 @@ const createFilmDetailsModalTemplate = (film) => {
                 </tr>
                 <tr class="film-details__row">
                   <td class="film-details__term">Release Date</td>
-                  <td class="film-details__cell">${date}</td>
+                  <td class="film-details__cell">${releaseDate}</td>
                 </tr>
                 <tr class="film-details__row">
                   <td class="film-details__term">Runtime</td>
@@ -109,29 +114,31 @@ const createFilmDetailsModalTemplate = (film) => {
             ${commentsList}
 
             <div class="film-details__new-comment">
-              <div for="add-emoji" class="film-details__add-emoji-label"></div>
+              <div for="add-emoji" class="film-details__add-emoji-label">
+                ${currentEmojiElement}
+              </div>
 
               <label class="film-details__comment-label">
-                <textarea class="film-details__comment-input" placeholder="Select reaction below and write comment here" name="comment"></textarea>
+                <textarea class="film-details__comment-input" placeholder="Select reaction below and write comment here" name="comment">${currentText}</textarea>
               </label>
 
               <div class="film-details__emoji-list">
-                <input class="film-details__emoji-item visually-hidden" name="comment-emoji" type="radio" id="emoji-smile" value="smile">
+                <input class="film-details__emoji-item visually-hidden" name="comment-emoji" type="radio" id="emoji-smile" value="smile" ${currentEmoji === `smile` ? `checked` : ``}>
                 <label class="film-details__emoji-label" for="emoji-smile">
                   <img src="./images/emoji/smile.png" width="30" height="30" alt="emoji">
                 </label>
 
-                <input class="film-details__emoji-item visually-hidden" name="comment-emoji" type="radio" id="emoji-sleeping" value="sleeping">
+                <input class="film-details__emoji-item visually-hidden" name="comment-emoji" type="radio" id="emoji-sleeping" value="sleeping" ${currentEmoji === `sleeping` ? `checked` : ``}>
                 <label class="film-details__emoji-label" for="emoji-sleeping">
                   <img src="./images/emoji/sleeping.png" width="30" height="30" alt="emoji">
                 </label>
 
-                <input class="film-details__emoji-item visually-hidden" name="comment-emoji" type="radio" id="emoji-puke" value="puke">
+                <input class="film-details__emoji-item visually-hidden" name="comment-emoji" type="radio" id="emoji-puke" value="puke" ${currentEmoji === `puke` ? `checked` : ``}>
                 <label class="film-details__emoji-label" for="emoji-puke">
                   <img src="./images/emoji/puke.png" width="30" height="30" alt="emoji">
                 </label>
 
-                <input class="film-details__emoji-item visually-hidden" name="comment-emoji" type="radio" id="emoji-angry" value="angry">
+                <input class="film-details__emoji-item visually-hidden" name="comment-emoji" type="radio" id="emoji-angry" value="angry" ${currentEmoji === `angry` ? `checked` : ``}>
                 <label class="film-details__emoji-label" for="emoji-angry">
                   <img src="./images/emoji/angry.png" width="30" height="30" alt="emoji">
                 </label>
@@ -144,33 +151,68 @@ const createFilmDetailsModalTemplate = (film) => {
   );
 };
 
-let onEscKeyDown;
-
-export default class FilmDetailsModal extends AbstractComponent {
+export default class FilmDetailsModal extends AbstractSmartComponent {
   constructor(props) {
     super(props);
     this._film = props;
+    this._watchlistHandler = null;
+    this._historyHandler = null;
+    this._favoriteHandler = null;
+
+    this._onEmojiChange = this._onEmojiChange.bind(this);
+    this._onTextInput = this._onTextInput.bind(this);
+    this._currentEmoji = null;
+    this._currentText = ``;
   }
 
   getTemplate() {
-    return createFilmDetailsModalTemplate(this._film);
+    return createFilmDetailsModalTemplate(this._film, {currentEmoji: this._currentEmoji, currentText: this._currentText});
   }
 
   getElement() {
     if (!this._element) {
       this._element = createElement(this.getTemplate());
       this._element.querySelector(`.film-details__close-btn`).addEventListener(`click`, this.removeElement.bind(this));
-      onEscKeyDown = (evt) => {
-        const isEscKey = evt.key === `Escape` || evt.key === `Esc`;
-
-        if (isEscKey) {
-          this.removeElement();
-          document.removeEventListener(`keydown`, onEscKeyDown);
-        }
-      };
-      document.addEventListener(`keydown`, onEscKeyDown);
+      this._element.querySelectorAll(`.film-details__emoji-list input[type="radio"]`).forEach((radio) => {
+        radio.addEventListener(`change`, this._onEmojiChange);
+      });
+      this._element.querySelector(`.film-details__comment-input`).addEventListener(`keyup`, this._onTextInput);
     }
 
     return this._element;
+  }
+
+  _onEmojiChange(evt) {
+    this._currentEmoji = evt.target.value;
+    this.rerender();
+  }
+
+  _onTextInput(evt) {
+    this._currentText = evt.target.value;
+  }
+
+  addWatchlistCheckboxHandler(handler) {
+    this._watchlistHandler = handler;
+    this._element.querySelector(`#watchlist`).addEventListener(`change`, handler);
+  }
+
+  addHistoryCheckboxHandler(handler) {
+    this._historyHandler = handler;
+    this._element.querySelector(`#watched`).addEventListener(`change`, handler);
+  }
+
+  addFavoriteCheckboxHandler(handler) {
+    this._favoriteHandler = handler;
+    this._element.querySelector(`#favorite`).addEventListener(`change`, handler);
+  }
+
+  recoveryListeners() {
+    this._element.querySelector(`.film-details__close-btn`).addEventListener(`click`, this.removeElement.bind(this));
+    this.addWatchlistCheckboxHandler(this._watchlistHandler);
+    this.addHistoryCheckboxHandler(this._historyHandler);
+    this.addFavoriteCheckboxHandler(this._favoriteHandler);
+    this._element.querySelectorAll(`.film-details__emoji-list input[type="radio"]`).forEach((radio) => {
+      radio.addEventListener(`change`, this._onEmojiChange);
+    });
   }
 }
