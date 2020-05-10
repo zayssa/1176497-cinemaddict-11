@@ -1,4 +1,5 @@
 import AbstractComponent from './AbstractComponent';
+import moment from 'moment';
 
 const createFilmCardTemplate = (film) => {
   const {
@@ -15,7 +16,9 @@ const createFilmCardTemplate = (film) => {
     isFavorite,
   } = film;
 
-  const year = date.getFullYear();
+  const year = moment(date).format(`YYYY`);
+  const durationTemp = moment.duration(duration, `minutes`);
+  const durationFormatted = `${durationTemp.hours()}h ${durationTemp.minutes()}m`;
   const genresAll = genres.join(`, `);
   const descriptionTrimmed = `${description.slice(0, 140)}${description.length > 140 ? `…` : ``}`;
   const commentsAmount = comments.length;
@@ -26,7 +29,7 @@ const createFilmCardTemplate = (film) => {
       <p class="film-card__rating">${rating}</p>
       <p class="film-card__info">
         <span class="film-card__year">${year}</span>
-        <span class="film-card__duration">${duration}</span>
+        <span class="film-card__duration">${durationFormatted}</span>
         <span class="film-card__genre">${genresAll}</span>
       </p>
       <img src="./images/posters/${poster}" alt="" class="film-card__poster">
