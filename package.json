@@ -20,6 +20,6 @@
     "node": "10"
   },
   "dependencies": {
-    "moment": "^2.25.3"
+    "moment": "2.25.3"
   }
 }
