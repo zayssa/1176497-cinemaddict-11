@@ -1,12 +1,4 @@
-import AbstractComponent from './AbstractComponent';
-
-
-export const createShowMoreButtonTemplate = () => {
-  return (
-    `<button class="films-list__show-more">Show more</button>`
-  );
-};
-
+import AbstractComponent from './abstract-component';
 
 export default class ShowMoreButton extends AbstractComponent {
   constructor(props) {
@@ -19,6 +11,8 @@ export default class ShowMoreButton extends AbstractComponent {
   }
 
   getTemplate() {
-    return createShowMoreButtonTemplate(this._data);
+    return (
+      `<button class="films-list__show-more">Show more</button>`
+    );
   }
 }

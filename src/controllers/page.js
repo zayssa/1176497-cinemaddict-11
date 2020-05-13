@@ -1,16 +1,18 @@
 import {render, remove} from '../utils/render';
+import moment from "moment";
 
-import FilmsSort from '../components/FilmsSort';
-import FilmsList from '../components/FilmsList';
-import NoFilms from '../components/NoFilms';
-import ShowMoreButton from '../components/ShowMoreButton';
+import FilmsSort from '../components/films-sort';
+import FilmsList from '../components/films-list';
+import NoFilms from '../components/no-films';
+import ShowMoreButton from '../components/show-more-button';
 import FilmController from './film';
 
 const FILM_CARDS = 5;
 const FILM_CARDS_SPECIAL = 2;
 
 export default class PageController {
-  constructor(container) {
+  constructor(container, comments) {
+    this._comments = comments;
     this._container = container;
     this._filmsListElement = null;
     this._filmsListContainerElement = null;
@@ -26,7 +28,7 @@ export default class PageController {
 
   loadMoreFilms() {
     for (let i = 0; i < FILM_CARDS && this._filmsShown < this._films.length; i++) {
-      const filmController = new FilmController(this._filmsListContainerElement, this._onDataChange, this._onViewChange);
+      const filmController = new FilmController(this._filmsListContainerElement, this._onDataChange, this._onViewChange, this._comments);
       filmController.render(this._films[this._filmsShown]);
       this._filmsControllers.push(filmController);
       this._filmsShown++;
@@ -66,9 +68,9 @@ export default class PageController {
       const sortedFilms = currentSortType === `default` ? [...films]
         : [...films].sort((a, b) => {
           if (currentSortType === `date`) {
-            return a.date - b.date;
+            return moment(a.release.date) - moment(b.release.date);
           }
-          return b.rating - a.rating;
+          return b.film_info.total_rating - a.film_info.total_rating;
         });
       this._films = sortedFilms;
 
@@ -79,15 +81,15 @@ export default class PageController {
     const filmTopRatedElement = this._container.querySelector(`.films-list--extra`);
     const filmMostCommentedElement = this._container.querySelector(`.films-list--extra + .films-list--extra`);
     const topRatedFilms = [...films]
-      .filter((film) => film.rating > 0)
-      .sort((a, b) => b.rating - a.rating)
+      .filter((film) => film.film_info.total_rating > 0)
+      .sort((a, b) => b.film_info.total_rating - a.film_info.total_rating)
       .slice(0, 2);
     if (topRatedFilms.length === 0) {
       filmTopRatedElement.remove();
     } else {
       const filmTopRatedListElement = filmTopRatedElement.querySelector(`.films-list__container`);
       for (let i = 0; i < FILM_CARDS_SPECIAL && i < topRatedFilms.length; i++) {
-        const filmController = new FilmController(filmTopRatedListElement, this._onDataChange, this._onViewChange);
+        const filmController = new FilmController(filmTopRatedListElement, this._onDataChange, this._onViewChange, this._comments);
         filmController.render(topRatedFilms[i]);
         this._filmsControllers.push(filmController);
       }
@@ -102,7 +104,7 @@ export default class PageController {
     } else {
       const filmMostCommentedListElement = filmMostCommentedElement.querySelector(`.films-list__container`);
       for (let i = 0; i < FILM_CARDS_SPECIAL; i++) {
-        const filmController = new FilmController(filmMostCommentedListElement, this._onDataChange, this._onViewChange);
+        const filmController = new FilmController(filmMostCommentedListElement, this._onDataChange, this._onViewChange, this._comments);
         filmController.render(mostCommentedFilms[i]);
         this._filmsControllers.push(filmController);
       }
