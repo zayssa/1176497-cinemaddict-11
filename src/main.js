@@ -1,24 +1,31 @@
-import {mock} from './components/mock';
+import {getFilms} from './models/films';
+import {getComments} from './models/comments';
+import {user, siteinfo} from './models/mock';
 import {render} from './utils/render';
 
-import UserRank from './components/UserRank';
-import SiteMenu from './components/SiteMenu';
-import FooterStats from './components/FooterStats';
+import UserRank from './components/user-rank';
+import SiteMenu from './components/site-menu';
+import FooterStats from './components/footer-stats';
 import PageController from './controllers/page';
 
+const MOCK_FILMS_AMOUNT = 20;
+const films = getFilms(MOCK_FILMS_AMOUNT);
+const commentsAmount = films[MOCK_FILMS_AMOUNT - 1].comments[0] + films[MOCK_FILMS_AMOUNT - 1].comments.length;
+const comments = getComments(commentsAmount);
+
 const siteHeaderElement = document.querySelector(`.header`);
-render(siteHeaderElement, new UserRank(mock.user));
+render(siteHeaderElement, new UserRank(user));
 
 const siteMainElement = document.querySelector(`.main`);
 const filterParams = [
-  mock.films.list.filter((a) => a.isWatchlist).length,
-  mock.films.list.filter((a) => a.isHistory).length,
-  mock.films.list.filter((a) => a.isFavorite).length
+  films.filter((a) => a.user_details.watchlist).length,
+  films.filter((a) => a.user_details.already_watched).length,
+  films.filter((a) => a.user_details.favorite).length
 ];
 render(siteMainElement, new SiteMenu(filterParams));
 
-const filmsList = new PageController(siteMainElement);
-filmsList.render(mock.films.list);
+const filmsList = new PageController(siteMainElement, comments);
+filmsList.render(films);
 
 const siteFooterStatsElement = document.querySelector(`.footer__statistics`);
-render(siteFooterStatsElement, new FooterStats(mock.films.total));
+render(siteFooterStatsElement, new FooterStats(siteinfo.filmsTotal));
