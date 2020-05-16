@@ -20,6 +20,8 @@ export default class FilmDetailsModal extends AbstractSmartComponent {
   }
 
   getTemplate() {
+    const durationTemp = moment.duration(this._film.film_info.runtime, `minutes`);
+    const durationFormatted = `${durationTemp.hours()}h ${durationTemp.minutes()}m`;
     const filmComments = this._comments.filter((comment) => this._film.comments.includes(comment.id));
     const releaseDate = moment(this._film.film_info.release.date).format(`D MMMM YYYY`);
     const genresLabel = `Genre${this._film.film_info.genre.length > 1 ? `s` : ``}`;
@@ -73,7 +75,7 @@ export default class FilmDetailsModal extends AbstractSmartComponent {
                   </tr>
                   <tr class="film-details__row">
                     <td class="film-details__term">Runtime</td>
-                    <td class="film-details__cell">${this._film.film_info.runtime}</td>
+                    <td class="film-details__cell">${durationFormatted}</td>
                   </tr>
                   <tr class="film-details__row">
                     <td class="film-details__term">Country</td>

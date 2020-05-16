@@ -98,7 +98,7 @@ const generateMovie = () => {
   film.writers = getRandomArrayElements(writers, 1, 4).join(`, `);
   film.actors = getRandomArrayElements(actors, 3, 10).join(`, `);
   film.date = getRandomDate();
-  film.duration = `${Math.ceil(Math.random() * 2)}h ${Math.floor(Math.random() * 60)}m`;
+  film.duration = Math.ceil(Math.random() * 180);
   film.country = getRandomArrayElements(countries)[0];
   film.genres = getRandomArrayElements(genres, 1, 4);
   film.restriction = getRandomArrayElements(restrictions)[0];
