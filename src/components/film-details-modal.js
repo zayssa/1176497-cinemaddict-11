@@ -192,6 +192,10 @@ export default class FilmDetailsModal extends AbstractSmartComponent {
     this._element.querySelector(`#favorite`).addEventListener(`change`, handler);
   }
 
+  addDeleteCommentHandler(handler) {
+    this._element.querySelector(`.film-details__comment-delete`).addEventListener(`click`, handler);
+  }
+
   recoveryListeners() {
     this._element.querySelector(`.film-details__close-btn`).addEventListener(`click`, this.removeElement.bind(this));
     this.addWatchlistCheckboxHandler(this._watchlistHandler);
