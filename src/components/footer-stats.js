@@ -3,7 +3,7 @@ import AbstractComponent from './abstract-component';
 export default class FooterStats extends AbstractComponent {
   constructor(props) {
     super(props);
-    this._data = props;
+    this._total = props;
   }
 
   getTemplate() {

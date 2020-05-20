@@ -1,4 +1,4 @@
-import {render, remove} from '../utils/render';
+import {render, replace, remove} from '../utils/render';
 
 import FilmCard from '../components/film-card';
 import FilmDetailsModal from '../components/film-details-modal';
@@ -19,31 +19,39 @@ export default class FilmController {
 
   render(film) {
     this._film = film;
+    const oldFilmCardComponent = this._filmCardComponent;
     this._filmCardComponent = new FilmCard(this._film);
-    render(this._container, this._filmCardComponent);
+
+    if (oldFilmCardComponent) {
+      replace(this._filmCardComponent, oldFilmCardComponent);
+    } else {
+      render(this._container, this._filmCardComponent);
+    }
 
     this._filmCardComponent.addFilmTitleHandler(this._openFilmDetails);
     this._filmCardComponent.addFilmPosterHandler(this._openFilmDetails);
     this._filmCardComponent.addFilmCommentsHandler(this._openFilmDetails);
     this._filmCardComponent.addWatchlistButtonHandler(() => {
       this._onDataChange(this, this._film, Object.assign({}, this._film, {
-        "user_details": {
+        "user_details": Object.assign({}, this._film.user_details, {
           watchlist: !this._film.user_details.watchlist
-        }
+        })
       }));
     });
     this._filmCardComponent.addFavoriteButtonHandler(() => {
       this._onDataChange(this, this._film, Object.assign({}, this._film, {
-        "user_details": {
+        "user_details": Object.assign({}, this._film.user_details, {
           favorite: !this._film.user_details.favorite
-        }
+        })
       }));
     });
     this._filmCardComponent.addHistoryButtonHandler(() => {
+      const watchingDate = this._film.isWatched ? null : new Date();
       this._onDataChange(this, this._film, Object.assign({}, this._film, {
-        "user_details": {
-          "already_watched": !this._film.user_details.already_watched
-        }
+        "user_details": Object.assign({}, this._film.user_details, {
+          "already_watched": !this._film.user_details.already_watched,
+          "watching_date": watchingDate
+        })
       }));
     });
   }
@@ -55,23 +63,32 @@ export default class FilmController {
     render(siteBodyElement, this._filmDetailsComponent);
     this._filmDetailsComponent.addWatchlistCheckboxHandler((evt) => {
       this._onDataChange(this, this._film, Object.assign({}, this._film, {
-        "user_details": {
+        "user_details": Object.assign({}, this._film.user_details, {
           watchlist: evt.target.checked
-        }
+        })
       }));
     });
     this._filmDetailsComponent.addFavoriteCheckboxHandler((evt) => {
       this._onDataChange(this, this._film, Object.assign({}, this._film, {
-        "user_details": {
+        "user_details": Object.assign({}, this._film.user_details, {
           favorite: evt.target.checked
-        }
+        })
       }));
     });
     this._filmDetailsComponent.addHistoryCheckboxHandler((evt) => {
+      const watchingDate = this._film.isWatched ? null : new Date();
       this._onDataChange(this, this._film, Object.assign({}, this._film, {
-        "user_details": {
-          "already_watched": evt.target.checked
-        }
+        "user_details": Object.assign({}, this._film.user_details, {
+          "already_watched": evt.target.checked,
+          "watching_date": watchingDate
+        })
+      }));
+    });
+    this._filmDetailsComponent.addDeleteCommentHandler((evt) => {
+      evt.preventDefault();
+      evt.stopPropagation();
+      this._onDataChange(this, this._comments, Object.assign({}, this._film, {
+        comments: this._film.comments.filter((comment) => comment.id !== evt.target.dataset.id)
       }));
     });
     document.addEventListener(`keydown`, this._onEscKeyDownHandler);
@@ -88,5 +105,11 @@ export default class FilmController {
     if (isEscKey) {
       this._closeFilmDetails();
     }
+  }
+
+  destroy() {
+    remove(this._filmCardComponent);
+    remove(this._filmDetailsComponent);
+    document.removeEventListener(`keydown`, this._onEscKeyDown);
   }
 }
