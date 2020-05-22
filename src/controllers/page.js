@@ -11,13 +11,14 @@ const FILM_CARDS = 5;
 const FILM_CARDS_SPECIAL = 2;
 
 const sortFilms = (films, sort) => {
-  return sort === `default` ? [...films]
-    : [...films].sort((a, b) => {
-      if (sort === `date`) {
-        return moment(a.film_info.release.date) - moment(b.film_info.release.date);
-      }
-      return b.film_info.total_rating - a.film_info.total_rating;
-    });
+  switch (sort) {
+    case `date`:
+      return [...films].sort((a, b) => moment(a.film_info.release.date) - moment(b.film_info.release.date));
+    case `rating`:
+      return [...films].sort((a, b) => b.film_info.total_rating - a.film_info.total_rating);
+    default:
+      return [...films];
+  }
 };
 
 export default class PageController {

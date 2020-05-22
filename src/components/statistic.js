@@ -14,11 +14,9 @@ const Period = {
 };
 
 const getGenres = (films) => {
-  let genres = [];
-
-  for (const film of films) {
-    genres = genres.concat(film.film_info.genre);
-  }
+  const genres = films.reduce((acc, film) => {
+    return acc.concat(film.film_info.genre);
+  }, []);
 
   return Array.from(new Set(genres));
 };
