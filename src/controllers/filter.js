@@ -4,9 +4,11 @@ import {render, replace} from "../utils/render.js";
 import {getFilmsByFilter} from "../utils/filter.js";
 
 export default class FilterController {
-  constructor(container, filmsModel) {
+  constructor(container, filmsModel, statistics, pageController) {
     this._container = container;
     this._filmsModel = filmsModel;
+    this._statistics = statistics;
+    this._pageController = pageController;
 
     this._activeFilterType = FilterType.ALL;
     this._siteMenuComponent = null;
@@ -40,8 +42,17 @@ export default class FilterController {
   }
 
   _onFilterChange(filterType) {
-    this._filmsModel.setFilter(filterType);
     this._activeFilterType = filterType;
+    switch (filterType) {
+      case FilterType.STATS:
+        this._pageController.hide();
+        this._statistics.show();
+        break;
+      default:
+        this._statistics.hide();
+        this._pageController.show();
+        this._filmsModel.setFilter(filterType);
+    }
     this.render();
   }
 

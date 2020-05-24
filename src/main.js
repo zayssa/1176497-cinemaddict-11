@@ -5,8 +5,10 @@ import {render} from './utils/render';
 
 import UserRank from './components/user-rank';
 import FooterStats from './components/footer-stats';
+import FilmsPage from './components/page';
 import PageController from './controllers/page';
 import FilterController from './controllers/filter';
+import Statistics from './components/statistic';
 
 const MOCK_FILMS_AMOUNT = 20;
 const filmsModel = new Films();
@@ -19,11 +21,16 @@ const siteHeaderElement = document.querySelector(`.header`);
 render(siteHeaderElement, new UserRank(user));
 
 const siteMainElement = document.querySelector(`.main`);
-const siteMenuController = new FilterController(siteMainElement, filmsModel);
+const filmsPage = new FilmsPage();
+const statistics = new Statistics(filmsModel);
+const filmsList = new PageController(filmsPage, filmsModel, comments);
+const siteMenuController = new FilterController(siteMainElement, filmsModel, statistics, filmsList);
 siteMenuController.render();
-
-const filmsList = new PageController(siteMainElement, filmsModel, comments);
+render(siteMainElement, filmsPage);
 filmsList.render();
+
+render(siteMainElement, statistics);
+statistics.hide();
 
 const siteFooterStatsElement = document.querySelector(`.footer__statistics`);
 render(siteFooterStatsElement, new FooterStats(siteinfo.filmsTotal));

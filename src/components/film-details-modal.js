@@ -152,9 +152,9 @@ export default class FilmDetailsModal extends AbstractSmartComponent {
   getElement() {
     if (!this._element) {
       this._element = createElement(this.getTemplate());
-      this._element.querySelector(`.film-details__close-btn`).addEventListener(`click`, this._onCloseButtonClick);
-      this._element.querySelector(`.film-details__emoji-list`).addEventListener(`change`, this._onEmojiChange);
-      this._element.querySelector(`.film-details__comment-input`).addEventListener(`keyup`, this._onTextInput);
+      this.getElement().querySelector(`.film-details__close-btn`).addEventListener(`click`, this._onCloseButtonClick);
+      this.getElement().querySelector(`.film-details__emoji-list`).addEventListener(`change`, this._onEmojiChange);
+      this.getElement().querySelector(`.film-details__comment-input`).addEventListener(`keyup`, this._onTextInput);
     }
 
     return this._element;
@@ -179,29 +179,29 @@ export default class FilmDetailsModal extends AbstractSmartComponent {
 
   addWatchlistCheckboxHandler(handler) {
     this._watchlistHandler = handler;
-    this._element.querySelector(`#watchlist`).addEventListener(`change`, handler);
+    this.getElement().querySelector(`#watchlist`).addEventListener(`change`, handler);
   }
 
   addHistoryCheckboxHandler(handler) {
     this._historyHandler = handler;
-    this._element.querySelector(`#watched`).addEventListener(`change`, handler);
+    this.getElement().querySelector(`#watched`).addEventListener(`change`, handler);
   }
 
   addFavoriteCheckboxHandler(handler) {
     this._favoriteHandler = handler;
-    this._element.querySelector(`#favorite`).addEventListener(`change`, handler);
+    this.getElement().querySelector(`#favorite`).addEventListener(`change`, handler);
   }
 
   addDeleteCommentHandler(handler) {
-    this._element.querySelector(`.film-details__comment-delete`).addEventListener(`click`, handler);
+    this.getElement().querySelector(`.film-details__comment-delete`).addEventListener(`click`, handler);
   }
 
   recoveryListeners() {
-    this._element.querySelector(`.film-details__close-btn`).addEventListener(`click`, this.removeElement.bind(this));
+    this.getElement().querySelector(`.film-details__close-btn`).addEventListener(`click`, this.removeElement.bind(this));
     this.addWatchlistCheckboxHandler(this._watchlistHandler);
     this.addHistoryCheckboxHandler(this._historyHandler);
     this.addFavoriteCheckboxHandler(this._favoriteHandler);
-    this._element.querySelectorAll(`.film-details__emoji-list input[type="radio"]`).forEach((radio) => {
+    this.getElement().querySelectorAll(`.film-details__emoji-list input[type="radio"]`).forEach((radio) => {
       radio.addEventListener(`change`, this._onEmojiChange);
     });
   }
