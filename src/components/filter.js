@@ -1,4 +1,5 @@
 import AbstractComponent from './abstract-component';
+import {FilterType} from '../utils/const';
 
 export default class SiteMenu extends AbstractComponent {
   constructor(props) {
@@ -15,7 +16,7 @@ export default class SiteMenu extends AbstractComponent {
         <a href="#history" class="main-navigation__item ${this._data.already_watched.checked ? `main-navigation__item--active` : ``}">History <span class="main-navigation__item-count">${this._data.already_watched.count}</span></a>
         <a href="#favorites" class="main-navigation__item ${this._data.favorite.checked ? `main-navigation__item--active` : ``}">Favorites <span class="main-navigation__item-count">${this._data.favorite.count}</span></a>
       </div>
-      <a href="#stats" class="main-navigation__additional">Stats</a>
+      <a href="#stats" class="main-navigation__additional ${this._data.stats.checked ? `main-navigation__item--active` : ``}">Stats</a>
     </nav>`);
   }
 
@@ -24,16 +25,16 @@ export default class SiteMenu extends AbstractComponent {
       if (evt.target.tagName !== `A`) {
         return;
       }
-      const filterType = evt.target.getAttribute(`href`).substr(1);
-      switch (filterType) {
+      const filterTypeCurrent = evt.target.getAttribute(`href`).substr(1);
+      switch (filterTypeCurrent) {
         case `favorites`:
-          handler(`favorite`);
+          handler(FilterType.FAVORITES);
           break;
         case `history`:
-          handler(`already_watched`);
+          handler(FilterType.HISTORY);
           break;
         default:
-          handler(filterType);
+          handler(filterTypeCurrent);
       }
     });
   }

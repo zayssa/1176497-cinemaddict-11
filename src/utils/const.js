@@ -3,4 +3,5 @@ export const FilterType = {
   WATCHLIST: `watchlist`,
   HISTORY: `already_watched`,
   FAVORITES: `favorite`,
+  STATS: `stats`,
 };
