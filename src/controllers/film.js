@@ -4,9 +4,9 @@ import FilmCard from '../components/film-card';
 import FilmDetailsModal from '../components/film-details-modal';
 
 export default class FilmController {
-  constructor(container, onDataChange, onViewChange, comments) {
+  constructor(container, onDataChange, onViewChange, api) {
     this._container = container;
-    this._comments = comments;
+    this._api = api;
     this._filmCardComponent = null;
     this._filmDetailsComponent = null;
     this._openFilmDetails = this._openFilmDetails.bind(this);
@@ -58,9 +58,10 @@ export default class FilmController {
 
   _openFilmDetails() {
     this._onViewChange();
-    this._filmDetailsComponent = new FilmDetailsModal(this._film, this._comments);
+    this._filmDetailsComponent = new FilmDetailsModal(this._film, this._api);
     const siteBodyElement = document.querySelector(`body`);
     render(siteBodyElement, this._filmDetailsComponent);
+    this._filmDetailsComponent.loadComments();
     this._filmDetailsComponent.addWatchlistCheckboxHandler((evt) => {
       this._onDataChange(this, this._film, Object.assign({}, this._film, {
         "user_details": Object.assign({}, this._film.user_details, {
@@ -84,6 +85,7 @@ export default class FilmController {
         })
       }));
     });
+    document.addEventListener(`keydown`, this._onEscKeyDownHandler);
     this._filmDetailsComponent.addDeleteCommentHandler((evt) => {
       evt.preventDefault();
       evt.stopPropagation();
@@ -91,7 +93,6 @@ export default class FilmController {
         comments: this._film.comments.filter((comment) => comment.id !== evt.target.dataset.id)
       }));
     });
-    document.addEventListener(`keydown`, this._onEscKeyDownHandler);
   }
 
   _closeFilmDetails() {

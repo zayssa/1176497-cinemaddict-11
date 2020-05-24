@@ -4,10 +4,10 @@ import {render, replace} from "../utils/render.js";
 import {getFilmsByFilter} from "../utils/filter.js";
 
 export default class FilterController {
-  constructor(container, filmsModel, statistics, pageController) {
+  constructor(container, filmsModel, pageController) {
     this._container = container;
     this._filmsModel = filmsModel;
-    this._statistics = statistics;
+    this._statistics = null;
     this._pageController = pageController;
 
     this._activeFilterType = FilterType.ALL;
@@ -58,5 +58,9 @@ export default class FilterController {
 
   _onDataChange() {
     this.render();
+  }
+
+  addStatistic(statistics) {
+    this._statistics = statistics;
   }
 }

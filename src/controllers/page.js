@@ -22,9 +22,9 @@ const sortFilms = (films, sort) => {
 };
 
 export default class PageController {
-  constructor(container, filmsModel, comments) {
-    this._comments = comments;
+  constructor(container, filmsModel, api) {
     this._container = container;
+    this._api = api;
     this._filmsListElement = null;
     this._filmsListContainerElement = null;
     this._filmsList = new FilmsList();
@@ -47,7 +47,7 @@ export default class PageController {
   loadMoreFilms() {
     const films = sortFilms(this._filmsModel.getFilms(), this._sort);
     for (let i = 0; i < FILM_CARDS && this._filmsShown < films.length; i++) {
-      const filmController = new FilmController(this._filmsListContainerElement, this._onDataChange, this._onViewChange, this._comments);
+      const filmController = new FilmController(this._filmsListContainerElement, this._onDataChange, this._onViewChange, this._api);
       filmController.render(films[this._filmsShown]);
       this._filmsControllers.push(filmController);
       this._filmsShown++;
@@ -147,11 +147,16 @@ export default class PageController {
   }
 
   _onDataChange(filmController, oldData, newData) {
-    const isSuccess = this._filmsModel.updateFilm(oldData.id, newData);
+    this._api.setFilm(newData)
+      .then((response) => {
+        if (!response.error) {
+          const isSuccess = this._filmsModel.updateFilm(oldData.id, newData);
 
-    if (isSuccess) {
-      filmController.render(newData);
-    }
+          if (isSuccess) {
+            filmController.render(newData);
+          }
+        }
+      });
   }
 
   _onViewChange() {
