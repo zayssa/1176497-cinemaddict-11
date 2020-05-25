@@ -9,6 +9,7 @@ export default class FilmDetailsModal extends AbstractSmartComponent {
     this._api = api;
     this._film = film;
     this._comments = [];
+    this.loadComments();
     this._watchlistHandler = null;
     this._historyHandler = null;
     this._favoriteHandler = null;
@@ -18,6 +19,10 @@ export default class FilmDetailsModal extends AbstractSmartComponent {
     this._onTextInput = this._onTextInput.bind(this);
     this._currentEmoji = null;
     this._currentText = ``;
+
+    this._deleteHandler = null;
+    this._createHandler = null;
+    this._deleteCommentHelper = this._deleteCommentHelper.bind(this);
   }
 
   getTemplate() {
@@ -107,7 +112,7 @@ export default class FilmDetailsModal extends AbstractSmartComponent {
 
           <div class="form-details__bottom-container">
             <section class="film-details__comments-wrap">
-              <h3 class="film-details__comments-title">Comments <span class="film-details__comments-count">${this._film.comments.length}</span></h3>
+              <h3 class="film-details__comments-title">Comments <span class="film-details__comments-count">${this._comments.length}</span></h3>
 
               ${commentsList}
 
@@ -175,15 +180,35 @@ export default class FilmDetailsModal extends AbstractSmartComponent {
 
   _onTextInput(evt) {
     this._currentText = evt.target.value;
+    if ((evt.ctrlKey || evt.metaKey) && evt.key === `Enter`) {
+      const comment = {
+        "comment": this._currentText,
+        "date": new Date(),
+        "emotion": this._currentEmoji
+      };
+      const form = this.getElement().querySelector(`.film-details__new-comment`);
+      form.classList.remove(`shake`);
+      this._api.createComment(this._film.id, comment)
+        .then((response) => {
+          if (response.error || response.errors) {
+            form.classList.add(`shake`);
+          } else {
+            this._createHandler(response.movie);
+          }
+        });
+    }
   }
 
   loadComments() {
-    this._api.getComments(this._film.id).then((comments) => {
-      this._comments = comments;
-      this.rerender();
-    }).catch(() => {
-      this._element.querySelector(`.form-details__bottom-container`).remove();
-    });
+    this._comments = [];
+    this._api.getComments(this._film.id)
+      .then((comments) => {
+        this._comments = comments;
+        this.rerender();
+      })
+      .catch(() => {
+        this._element.querySelector(`.form-details__bottom-container`).remove();
+      });
   }
 
   addWatchlistCheckboxHandler(handler) {
@@ -202,7 +227,35 @@ export default class FilmDetailsModal extends AbstractSmartComponent {
   }
 
   addDeleteCommentHandler(handler) {
-    this.getElement().querySelector(`.film-details__comment-delete`).addEventListener(`click`, handler);
+    this._deleteHandler = handler;
+  }
+
+  addCreateCommentHandler(handler) {
+    this._createHandler = handler;
+  }
+
+  _deleteCommentHelper(evt) {
+    if (!evt.target.classList.contains(`film-details__comment-delete`)) {
+      return;
+    }
+    evt.preventDefault();
+    evt.stopPropagation();
+    const buttonElement = evt.target;
+    const commentId = buttonElement.dataset.id;
+    buttonElement.textContent = `Deleting...`;
+    buttonElement.disabled = true;
+    buttonElement.classList.remove(`shake`);
+    this._api.deleteComment(commentId)
+      .then((response) => {
+        if (!response.ok) {
+          buttonElement.classList.add(`shake`);
+          buttonElement.textContent = `Delete`;
+          buttonElement.disabled = false;
+        } else {
+          this._deleteHandler(commentId);
+          this.rerender();
+        }
+      });
   }
 
   recoveryListeners() {
@@ -213,5 +266,6 @@ export default class FilmDetailsModal extends AbstractSmartComponent {
     this.getElement().querySelectorAll(`.film-details__emoji-list input[type="radio"]`).forEach((radio) => {
       radio.addEventListener(`change`, this._onEmojiChange);
     });
+    this.getElement().addEventListener(`click`, this._deleteCommentHelper);
   }
 }
