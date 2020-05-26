@@ -4,10 +4,11 @@ import AbstractSmartComponent from './abstract-smart-component';
 import moment from "moment";
 
 export default class FilmDetailsModal extends AbstractSmartComponent {
-  constructor(film, comments) {
-    super(film, comments);
+  constructor(film, api) {
+    super();
+    this._api = api;
     this._film = film;
-    this._comments = comments;
+    this._comments = [];
     this._watchlistHandler = null;
     this._historyHandler = null;
     this._favoriteHandler = null;
@@ -22,11 +23,10 @@ export default class FilmDetailsModal extends AbstractSmartComponent {
   getTemplate() {
     const durationTemp = moment.duration(this._film.film_info.runtime, `minutes`);
     const durationFormatted = `${durationTemp.hours()}h ${durationTemp.minutes()}m`;
-    const filmComments = this._comments.filter((comment) => this._film.comments.includes(comment.id));
     const releaseDate = moment(this._film.film_info.release.date).format(`D MMMM YYYY`);
     const genresLabel = `Genre${this._film.film_info.genre.length > 1 ? `s` : ``}`;
     const genresList = this._film.film_info.genre.map((genre) => `<span class="film-details__genre">${genre}</span>`).join(``);
-    const commentsList = new FilmComments(filmComments).getTemplate();
+    const commentsList = new FilmComments(this._comments).getTemplate();
 
     const currentEmojiElement = this._currentEmoji ? `<img src="images/emoji/${this._currentEmoji}.png" width="55" height="55" alt="emoji-${this._currentEmoji}">` : ``;
 
@@ -39,7 +39,7 @@ export default class FilmDetailsModal extends AbstractSmartComponent {
             </div>
             <div class="film-details__info-wrap">
               <div class="film-details__poster">
-                <img class="film-details__poster-img" src="./images/posters/${this._film.film_info.poster}" alt="">
+                <img class="film-details__poster-img" src="${this._film.film_info.poster}" alt="">
 
                 <p class="film-details__age">${this._film.film_info.age_rating}+</p>
               </div>
@@ -175,6 +175,15 @@ export default class FilmDetailsModal extends AbstractSmartComponent {
 
   _onTextInput(evt) {
     this._currentText = evt.target.value;
+  }
+
+  loadComments() {
+    this._api.getComments(this._film.id).then((comments) => {
+      this._comments = comments;
+      this.rerender();
+    }).catch(() => {
+      this._element.querySelector(`.form-details__bottom-container`).remove();
+    });
   }
 
   addWatchlistCheckboxHandler(handler) {
