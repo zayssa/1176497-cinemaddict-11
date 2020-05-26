@@ -1,36 +1,51 @@
 import {Films} from './models/films';
-import {getComments} from './models/comments';
-import {user, siteinfo, generateFilms} from './models/mock';
-import {render} from './utils/render';
+import {user} from './models/mock';
+import {render, remove} from './utils/render';
 
+import API from './utils/api';
 import UserRank from './components/user-rank';
 import FooterStats from './components/footer-stats';
 import FilmsPage from './components/page';
 import PageController from './controllers/page';
 import FilterController from './controllers/filter';
 import Statistics from './components/statistic';
+import Loading from './components/loading';
 
-const MOCK_FILMS_AMOUNT = 20;
 const filmsModel = new Films();
-filmsModel.setFilms(generateFilms(MOCK_FILMS_AMOUNT));
-const films = filmsModel.getFilmsAll();
-const commentsAmount = films[MOCK_FILMS_AMOUNT - 1].comments[0] + films[MOCK_FILMS_AMOUNT - 1].comments.length;
-const comments = getComments(commentsAmount);
+
+const api = new API();
 
 const siteHeaderElement = document.querySelector(`.header`);
 render(siteHeaderElement, new UserRank(user));
 
 const siteMainElement = document.querySelector(`.main`);
 const filmsPage = new FilmsPage();
-const statistics = new Statistics(filmsModel);
-const filmsList = new PageController(filmsPage, filmsModel, comments);
-const siteMenuController = new FilterController(siteMainElement, filmsModel, statistics, filmsList);
+const filmsList = new PageController(filmsPage, filmsModel, api);
+const siteMenuController = new FilterController(siteMainElement, filmsModel, filmsList);
 siteMenuController.render();
 render(siteMainElement, filmsPage);
-filmsList.render();
 
-render(siteMainElement, statistics);
-statistics.hide();
+const loading = new Loading();
+render(filmsPage.getElement(), loading);
 
-const siteFooterStatsElement = document.querySelector(`.footer__statistics`);
-render(siteFooterStatsElement, new FooterStats(siteinfo.filmsTotal));
+api.getFilms().then((films) => {
+  filmsModel.setFilms(films);
+
+  const statistics = new Statistics(filmsModel);
+  siteMenuController.addStatistic(statistics);
+
+  remove(loading);
+
+  filmsList.render();
+  render(siteMainElement, statistics);
+  statistics.hide();
+
+  const siteFooterStatsElement = document.querySelector(`.footer__statistics`);
+  render(siteFooterStatsElement, new FooterStats(films.length));
+}).catch(() => {
+  filmsModel.setFilms([]);
+
+  remove(loading);
+
+  filmsList.render();
+});

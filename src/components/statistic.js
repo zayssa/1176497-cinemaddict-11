@@ -45,16 +45,16 @@ const getFilmsByPeriod = (films, period) => {
       return films;
 
     case Period.TODAY:
-      return films.filter((item) => item.date >= date.setDate(date.getDate() - 1));
+      return films.filter((item) => item.user_details.watching_date >= date.setDate(date.getDate() - 1));
 
     case Period.WEEK:
-      return films.filter((item) => item.date >= date.setDate(date.getDate() - 7));
+      return films.filter((item) => item.user_details.watching_date >= date.setDate(date.getDate() - 7));
 
     case Period.MONTH:
-      return films.filter((item) => item.date >= date.setMonth(date.getMonth() - 1));
+      return films.filter((item) => item.user_details.watching_date >= date.setMonth(date.getMonth() - 1));
 
     case Period.YEAR:
-      return films.filter((item) => item.date >= date.setFullYear(date.getFullYear() - 1));
+      return films.filter((item) => item.user_details.watching_date >= date.setFullYear(date.getFullYear() - 1));
 
     default:
       return films;
@@ -66,7 +66,6 @@ export default class Statistics extends AbstractSmartComponent {
     super(props);
 
     this._filmsModel = props;
-    this._films = this._filmsModel.getFilms();
     this._watchedFilms = getFilmsByFilter(this._filmsModel.getFilmsAll(), FilterType.HISTORY);
     this._filmsByPeriod = getFilmsByPeriod(this._watchedFilms, Period.ALL);
     this._period = Period.ALL;
@@ -136,7 +135,7 @@ export default class Statistics extends AbstractSmartComponent {
   }
 
   _renderChart(films) {
-    const BAR_HEIGHT = 50;
+    const BAR_HEIGHT = 60;
     const statisticCtx = document.querySelector(`.statistic__chart`);
 
     statisticCtx.height = BAR_HEIGHT * 5;
