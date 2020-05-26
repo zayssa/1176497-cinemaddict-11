@@ -149,12 +149,13 @@ export default class PageController {
   _onDataChange(filmController, oldData, newData) {
     this._api.setFilm(newData)
       .then((response) => {
-        if (!response.error) {
-          const isSuccess = this._filmsModel.updateFilm(oldData.id, newData);
+        if (response.error) {
+          return;
+        }
+        const isSuccess = this._filmsModel.updateFilm(oldData.id, newData);
 
-          if (isSuccess) {
-            filmController.render(newData);
-          }
+        if (isSuccess) {
+          filmController.render(newData);
         }
       });
   }

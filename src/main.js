@@ -11,11 +11,9 @@ import FilterController from './controllers/filter';
 import Statistics from './components/statistic';
 import Loading from './components/loading';
 
-const AUTHORIZATION = `Basic jvkuckluv67754`;
-
 const filmsModel = new Films();
 
-const api = new API(AUTHORIZATION);
+const api = new API();
 
 const siteHeaderElement = document.querySelector(`.header`);
 render(siteHeaderElement, new UserRank(user));
