@@ -1,13 +1,16 @@
+const AUTHORIZATION_TOKEN = `Basic jvkuckluv67754`;
+const API_HOST = `https://11.ecmascript.pages.academy/cinemaddict`;
+
 const API = class {
-  constructor(authorization) {
-    this._authorization = authorization;
+  constructor() {
+    this._authorization = AUTHORIZATION_TOKEN;
   }
 
   getFilms() {
     const headers = new Headers();
     headers.append(`Authorization`, this._authorization);
 
-    return fetch(`https://11.ecmascript.pages.academy/cinemaddict/movies`, {headers})
+    return fetch(`${API_HOST}/movies`, {headers})
       .then((response) => response.json());
   }
 
@@ -15,7 +18,7 @@ const API = class {
     const headers = new Headers();
     headers.append(`Authorization`, this._authorization);
 
-    return fetch(`https://11.ecmascript.pages.academy/cinemaddict/comments/${filmId}`, {headers})
+    return fetch(`${API_HOST}/comments/${filmId}`, {headers})
       .then((response) => response.json());
   }
 
@@ -24,7 +27,7 @@ const API = class {
     headers.append(`Authorization`, this._authorization);
     headers.append(`Content-Type`, `application/json`);
 
-    return fetch(`https://11.ecmascript.pages.academy/cinemaddict/movies/${film.id}`, {
+    return fetch(`${API_HOST}/movies/${film.id}`, {
       method: `PUT`,
       body: JSON.stringify(film),
       headers

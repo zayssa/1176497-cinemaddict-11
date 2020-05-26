@@ -5,7 +5,7 @@ import moment from "moment";
 
 export default class FilmDetailsModal extends AbstractSmartComponent {
   constructor(film, api) {
-    super(film);
+    super();
     this._api = api;
     this._film = film;
     this._comments = [];
