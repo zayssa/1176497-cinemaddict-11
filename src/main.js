@@ -1,8 +1,9 @@
 import {Films} from './models/films';
-import {user} from './models/mock';
 import {render, remove} from './utils/render';
 
-import API from './utils/api';
+import API from './api/index';
+import Store from './api/store';
+import Provider from './api/provider.js';
 import UserRank from './components/user-rank';
 import FooterStats from './components/footer-stats';
 import FilmsPage from './components/page';
@@ -14,13 +15,15 @@ import Loading from './components/loading';
 const filmsModel = new Films();
 
 const api = new API();
+const store = new Store(window.localStorage);
+const apiWithProvider = new Provider(api, store);
 
 const siteHeaderElement = document.querySelector(`.header`);
-render(siteHeaderElement, new UserRank(user));
+render(siteHeaderElement, new UserRank());
 
 const siteMainElement = document.querySelector(`.main`);
 const filmsPage = new FilmsPage();
-const filmsList = new PageController(filmsPage, filmsModel, api);
+const filmsList = new PageController(filmsPage, filmsModel, apiWithProvider);
 const siteMenuController = new FilterController(siteMainElement, filmsModel, filmsList);
 siteMenuController.render();
 render(siteMainElement, filmsPage);
@@ -28,7 +31,7 @@ render(siteMainElement, filmsPage);
 const loading = new Loading();
 render(filmsPage.getElement(), loading);
 
-api.getFilms().then((films) => {
+apiWithProvider.getFilms().then((films) => {
   filmsModel.setFilms(films);
 
   const statistics = new Statistics(filmsModel);
@@ -48,4 +51,20 @@ api.getFilms().then((films) => {
   remove(loading);
 
   filmsList.render();
+});
+
+window.addEventListener(`load`, () => {
+  navigator.serviceWorker.register(`/sw.js`)
+    .then(() => {})
+    .catch(() => {});
+});
+
+window.addEventListener(`online`, () => {
+  document.title = document.title.replace(` [offline]`, ``);
+
+  apiWithProvider.sync();
+});
+
+window.addEventListener(`offline`, () => {
+  document.title += ` [offline]`;
 });
