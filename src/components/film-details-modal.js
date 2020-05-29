@@ -33,8 +33,6 @@ export default class FilmDetailsModal extends AbstractSmartComponent {
     const genresList = this._film.film_info.genre.map((genre) => `<span class="film-details__genre">${genre}</span>`).join(``);
     const commentsList = new FilmComments(this._comments).getTemplate();
 
-    const currentEmojiElement = this._currentEmoji ? `<img src="images/emoji/${this._currentEmoji}.png" width="55" height="55" alt="emoji-${this._currentEmoji}">` : ``;
-
     return (
       `<section class="film-details">
         <form class="film-details__inner" action="" method="get">
@@ -117,9 +115,7 @@ export default class FilmDetailsModal extends AbstractSmartComponent {
               ${commentsList}
 
               <div class="film-details__new-comment">
-                <div for="add-emoji" class="film-details__add-emoji-label">
-                  ${currentEmojiElement}
-                </div>
+                <div for="add-emoji" class="film-details__add-emoji-label"></div>
 
                 <label class="film-details__comment-label">
                   <textarea class="film-details__comment-input" placeholder="Select reaction below and write comment here" name="comment">${this._currentText}</textarea>
@@ -175,10 +171,14 @@ export default class FilmDetailsModal extends AbstractSmartComponent {
       return;
     }
     this._currentEmoji = evt.target.value;
-    this.rerender();
+    this._element.querySelector(`.film-details__add-emoji-label`).innerHTML = `<img src="images/emoji/${this._currentEmoji}.png" width="55" height="55" alt="emoji-${this._currentEmoji}">`;
   }
 
   _onTextInput(evt) {
+    const form = this.getElement().querySelector(`.film-details__new-comment`);
+    if (form.querySelector(`textarea`).disabled) {
+      return;
+    }
     this._currentText = evt.target.value;
     if ((evt.ctrlKey || evt.metaKey) && evt.key === `Enter`) {
       const comment = {
@@ -186,10 +186,11 @@ export default class FilmDetailsModal extends AbstractSmartComponent {
         "date": new Date(),
         "emotion": this._currentEmoji
       };
-      const form = this.getElement().querySelector(`.film-details__new-comment`);
       form.classList.remove(`shake`);
+      form.querySelector(`textarea`).disabled = true;
       this._api.createComment(this._film.id, comment)
         .then((response) => {
+          form.querySelector(`textarea`).disabled = false;
           if (response.error || response.errors) {
             form.classList.add(`shake`);
           } else {
