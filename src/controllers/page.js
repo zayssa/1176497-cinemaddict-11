@@ -7,8 +7,7 @@ import NoFilms from '../components/no-films';
 import ShowMoreButton from '../components/show-more-button';
 import FilmController from './film';
 
-const FILM_CARDS = 5;
-const FILM_CARDS_SPECIAL = 2;
+import {FilmsLimit} from '../utils/const';
 
 const sortFilms = (films, sort) => {
   switch (sort) {
@@ -46,7 +45,7 @@ export default class PageController {
 
   loadMoreFilms() {
     const films = sortFilms(this._filmsModel.getFilms(), this._sort);
-    for (let i = 0; i < FILM_CARDS && this._filmsShown < films.length; i++) {
+    for (let i = 0; i < FilmsLimit.FILM_CARDS && this._filmsShown < films.length; i++) {
       const filmController = new FilmController(this._filmsListContainerElement, this._onDataChange, this._onViewChange, this._api);
       filmController.render(films[this._filmsShown]);
       this._filmsControllers.push(filmController);
@@ -100,7 +99,7 @@ export default class PageController {
       filmTopRatedElement.remove();
     } else {
       const filmTopRatedListElement = filmTopRatedElement.querySelector(`.films-list__container`);
-      for (let i = 0; i < FILM_CARDS_SPECIAL && i < topRatedFilms.length; i++) {
+      for (let i = 0; i < FilmsLimit.FILM_CARDS_SPECIAL && i < topRatedFilms.length; i++) {
         const filmController = new FilmController(filmTopRatedListElement, this._onDataChange, this._onViewChange, this._api);
         filmController.render(topRatedFilms[i]);
         this._specialFilmsControllers.push(filmController);
@@ -115,7 +114,7 @@ export default class PageController {
       filmMostCommentedElement.remove();
     } else {
       const filmMostCommentedListElement = filmMostCommentedElement.querySelector(`.films-list__container`);
-      for (let i = 0; i < FILM_CARDS_SPECIAL; i++) {
+      for (let i = 0; i < FilmsLimit.FILM_CARDS_SPECIAL; i++) {
         const filmController = new FilmController(filmMostCommentedListElement, this._onDataChange, this._onViewChange, this._api);
         filmController.render(mostCommentedFilms[i]);
         this._specialFilmsControllers.push(filmController);

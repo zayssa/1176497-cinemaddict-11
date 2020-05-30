@@ -45,16 +45,16 @@ const getFilmsByPeriod = (films, period) => {
       return films;
 
     case Period.TODAY:
-      return films.filter((item) => item.user_details.watching_date >= date.setDate(date.getDate() - 1));
+      return films.filter((item) => new Date(item.user_details.watching_date) >= date.setDate(date.getDate() - 1));
 
     case Period.WEEK:
-      return films.filter((item) => item.user_details.watching_date >= date.setDate(date.getDate() - 7));
+      return films.filter((item) => new Date(item.user_details.watching_date) >= date.setDate(date.getDate() - 7));
 
     case Period.MONTH:
-      return films.filter((item) => item.user_details.watching_date >= date.setMonth(date.getMonth() - 1));
+      return films.filter((item) => new Date(item.user_details.watching_date) >= date.setMonth(date.getMonth() - 1));
 
     case Period.YEAR:
-      return films.filter((item) => item.user_details.watching_date >= date.setFullYear(date.getFullYear() - 1));
+      return films.filter((item) => new Date(item.user_details.watching_date) >= date.setFullYear(date.getFullYear() - 1));
 
     default:
       return films;
@@ -74,23 +74,38 @@ export default class Statistics extends AbstractSmartComponent {
     this.setPeriodChange();
   }
 
+  _getRank() {
+    if (this._watchedFilms.length > 20) {
+      return `movie buff`;
+    }
+    if (this._watchedFilms.length > 10) {
+      return `fan`;
+    }
+    if (this._watchedFilms.length > 0) {
+      return `novice`;
+    }
+    return ``;
+  }
+
   getTemplate() {
     const summaryTime = this._filmsByPeriod.reduce((sum, current) => sum + current.film_info.runtime, 0);
     const durationTemp = moment.duration(summaryTime, `minutes`);
-    const durationHours = durationTemp.hours();
+    const durationHours = (summaryTime - summaryTime % 60) / 60;
     const durationMinutes = durationTemp.minutes();
     const topGenre = Object.entries(getGenreCounter(this._filmsByPeriod, this._genres))
       .sort((a, b) => b[1] - a[1])[0];
+    const userRank = this._getRank();
 
     const topGenreValue = topGenre[1] > 0 ? topGenre[0] : ``;
 
     return (
       `<section class="statistic">
+      ${userRank ? `
         <p class="statistic__rank">
           Your rank
           <img class="statistic__img" src="images/bitmap@2x.png" alt="Avatar" width="35" height="35">
-          <span class="statistic__rank-label">Sci-Fighter</span>
-        </p>
+          <span class="statistic__rank-label">${userRank}</span>
+        </p>` : ``}
 
         <form action="https://echo.htmlacademy.ru/" method="get" class="statistic__filters">
           <p class="statistic__filters-description">Show stats:</p>
