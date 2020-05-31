@@ -1,9 +1,7 @@
 const STORE_KEYS = {
   FILMS: `films`,
   COMMENTS: `comments`,
-  FILMS_TO_UPDATE: `films_unsync`,
-  COMMENTS_TO_DELETE: `comments_del`,
-  COMMENTS_TO_CREATE: `comments_add`
+  FILMS_TO_UPDATE: `films_unsync`
 };
 
 const isOnline = () => {
@@ -56,7 +54,7 @@ export default class Provider {
     const films = this._store.getData(STORE_KEYS.FILMS)
       .map((item) => film.id === item.id ? film : item);
     this._store.setData(STORE_KEYS.FILMS, films);
-    return Promise.resolve();
+    return Promise.resolve(film);
   }
 
   getComments(filmId) {
@@ -81,30 +79,7 @@ export default class Provider {
           return response;
         });
     }
-    this._synchronized = false;
-    const commentRandomId = `tempCommentId${+new Date()}`;
-
-    const commentsToCreate = this._store.getData(STORE_KEYS.COMMENTS_TO_CREATE) || [];
-    commentsToCreate.push({
-      "filmId": filmId,
-      "comment": comment
-    });
-    this._store.setData(STORE_KEYS.COMMENTS_TO_CREATE, commentsToCreate);
-
-    const commentTemporary = Object.assign({}, comment, {
-      id: commentRandomId,
-    });
-    const comments = this._store.getData(STORE_KEYS.COMMENTS);
-    comments.push(commentTemporary);
-    this._store.setData(STORE_KEYS.COMMENTS, comments);
-
-    const film = this._store.getData(STORE_KEYS.FILMS)
-      .find((item) => filmId === item.id);
-    film.comments.push(commentRandomId);
-    const films = this._store.getData(STORE_KEYS.FILMS)
-      .map((item) => filmId === item.id ? film : item);
-    this._store.setData(STORE_KEYS.FILMS, films);
-    return Promise.resolve(film);
+    return Promise.resolve({error: `offline`});
   }
 
   deleteComment(commentId) {
@@ -117,34 +92,15 @@ export default class Provider {
           return response;
         });
     }
-    this._synchronized = false;
-
-    const commentsToDelete = this._store.getData(STORE_KEYS.COMMENTS_TO_DELETE) || [];
-    commentsToDelete.push(commentId);
-    this._store.setData(STORE_KEYS.COMMENTS_TO_DELETE, commentsToDelete);
-
-    const comments = this._store.getData(STORE_KEYS.COMMENTS)
-      .filter((item) => commentId !== item.id);
-    this._store.setData(STORE_KEYS.COMMENTS, comments);
-    return Promise.resolve(commentId);
+    return Promise.resolve({error: `offline`});
   }
 
   sync() {
-    const commentsToCreate = this._store.getData(STORE_KEYS.COMMENTS_TO_CREATE);
-    commentsToCreate.forEach((commentToCreate) => {
-      this.createComment(commentToCreate.filmId, commentToCreate.comment);
-    });
-    this._store.setData(STORE_KEYS.COMMENTS_TO_CREATE, []);
-
-    const commentsToDelete = this._store.getData(STORE_KEYS.COMMENTS_TO_DELETE);
-    commentsToDelete.forEach((commentId) => {
-      this.deleteComment(commentId);
-    });
-    this._store.setData(STORE_KEYS.COMMENTS_TO_DELETE, []);
-
-    const filmsToUpdate = this._store.getData(STORE_KEYS.FILMS_TO_UPDATE);
+    const filmsToUpdate = this._store.getData(STORE_KEYS.FILMS_TO_UPDATE) || [];
     this._api.sync(filmsToUpdate).then(() => {
       this._store.setData(STORE_KEYS.FILMS_TO_UPDATE, []);
     });
+
+    this._synchronized = true;
   }
 }

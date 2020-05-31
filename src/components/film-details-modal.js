@@ -161,43 +161,15 @@ export default class FilmDetailsModal extends AbstractSmartComponent {
     return this._element;
   }
 
-  _onCloseButtonClick() {
-    this.getElement().remove();
-    this.removeElement();
-  }
-
-  _onEmojiChange(evt) {
-    if (!evt.target.value) {
-      return;
-    }
-    this._currentEmoji = evt.target.value;
-    this._element.querySelector(`.film-details__add-emoji-label`).innerHTML = `<img src="images/emoji/${this._currentEmoji}.png" width="55" height="55" alt="emoji-${this._currentEmoji}">`;
-  }
-
-  _onTextInput(evt) {
-    const form = this.getElement().querySelector(`.film-details__new-comment`);
-    if (form.querySelector(`textarea`).disabled) {
-      return;
-    }
-    this._currentText = evt.target.value;
-    if ((evt.ctrlKey || evt.metaKey) && evt.key === `Enter`) {
-      const comment = {
-        "comment": this._currentText,
-        "date": new Date(),
-        "emotion": this._currentEmoji
-      };
-      form.classList.remove(`shake`);
-      form.querySelector(`textarea`).disabled = true;
-      this._api.createComment(this._film.id, comment)
-        .then((response) => {
-          form.querySelector(`textarea`).disabled = false;
-          if (response.error || response.errors) {
-            form.classList.add(`shake`);
-          } else {
-            this._createHandler(response.movie);
-          }
-        });
-    }
+  recoveryListeners() {
+    this.getElement().querySelector(`.film-details__close-btn`).addEventListener(`click`, this.removeElement.bind(this));
+    this.addWatchlistCheckboxHandler(this._watchlistHandler);
+    this.addHistoryCheckboxHandler(this._historyHandler);
+    this.addFavoriteCheckboxHandler(this._favoriteHandler);
+    this.getElement().querySelectorAll(`.film-details__emoji-list input[type="radio"]`).forEach((radio) => {
+      radio.addEventListener(`change`, this._onEmojiChange);
+    });
+    this.getElement().addEventListener(`click`, this._deleteCommentHelper);
   }
 
   loadComments() {
@@ -235,6 +207,50 @@ export default class FilmDetailsModal extends AbstractSmartComponent {
     this._createHandler = handler;
   }
 
+  _onCloseButtonClick() {
+    this.getElement().remove();
+    this.removeElement();
+  }
+
+  _onEmojiChange(evt) {
+    if (!evt.target.value) {
+      return;
+    }
+    this._currentEmoji = evt.target.value;
+    this._element.querySelector(`.film-details__add-emoji-label`).innerHTML = `<img src="images/emoji/${this._currentEmoji}.png" width="55" height="55" alt="emoji-${this._currentEmoji}">`;
+  }
+
+  _onTextInput(evt) {
+    const form = this.getElement().querySelector(`.film-details__new-comment`);
+    const textarea = form.querySelector(`textarea`);
+    if (textarea.disabled) {
+      return;
+    }
+    this._currentText = evt.target.value;
+    if ((evt.ctrlKey || evt.metaKey) && evt.key === `Enter`) {
+      const comment = {
+        "comment": this._currentText,
+        "date": new Date(),
+        "emotion": this._currentEmoji
+      };
+      if (!this._currentEmoji || !this._currentText) {
+        this._shakeOnError(form);
+        textarea.disabled = false;
+        return;
+      }
+      textarea.disabled = true;
+      this._api.createComment(this._film.id, comment)
+        .then((response) => {
+          textarea.disabled = false;
+          if (response.error || response.errors) {
+            this._shakeOnError(form);
+          } else {
+            this._createHandler(response.movie);
+          }
+        });
+    }
+  }
+
   _deleteCommentHelper(evt) {
     if (!evt.target.classList.contains(`film-details__comment-delete`)) {
       return;
@@ -245,13 +261,14 @@ export default class FilmDetailsModal extends AbstractSmartComponent {
     const commentId = buttonElement.dataset.id;
     buttonElement.textContent = `Deleting...`;
     buttonElement.disabled = true;
-    buttonElement.classList.remove(`shake`);
     this._api.deleteComment(commentId)
       .then((response) => {
         if (!response.ok) {
-          buttonElement.classList.add(`shake`);
-          buttonElement.textContent = `Delete`;
-          buttonElement.disabled = false;
+          setTimeout(() => {
+            this._shakeOnError(buttonElement);
+            buttonElement.textContent = `Delete`;
+            buttonElement.disabled = false;
+          });
         } else {
           this._deleteHandler(commentId);
           this.rerender();
@@ -259,14 +276,11 @@ export default class FilmDetailsModal extends AbstractSmartComponent {
       });
   }
 
-  recoveryListeners() {
-    this.getElement().querySelector(`.film-details__close-btn`).addEventListener(`click`, this.removeElement.bind(this));
-    this.addWatchlistCheckboxHandler(this._watchlistHandler);
-    this.addHistoryCheckboxHandler(this._historyHandler);
-    this.addFavoriteCheckboxHandler(this._favoriteHandler);
-    this.getElement().querySelectorAll(`.film-details__emoji-list input[type="radio"]`).forEach((radio) => {
-      radio.addEventListener(`change`, this._onEmojiChange);
-    });
-    this.getElement().addEventListener(`click`, this._deleteCommentHelper);
+  _shakeOnError(element) {
+    element.classList.add(`shake`);
+
+    setTimeout(() => {
+      element.classList.remove(`shake`);
+    }, 300);
   }
 }

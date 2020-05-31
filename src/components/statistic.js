@@ -74,7 +74,7 @@ export default class Statistics extends AbstractSmartComponent {
     this.setPeriodChange();
   }
 
-  _getRank() {
+  getRank() {
     if (this._watchedFilms.length > 20) {
       return `movie buff`;
     }
@@ -94,7 +94,7 @@ export default class Statistics extends AbstractSmartComponent {
     const durationMinutes = durationTemp.minutes();
     const topGenre = Object.entries(getGenreCounter(this._filmsByPeriod, this._genres))
       .sort((a, b) => b[1] - a[1])[0];
-    const userRank = this._getRank();
+    const userRank = this.getRank();
 
     const topGenreValue = topGenre[1] > 0 ? topGenre[0] : ``;
 

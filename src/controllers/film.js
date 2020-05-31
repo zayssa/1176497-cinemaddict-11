@@ -58,6 +58,7 @@ export default class FilmController {
 
   _openFilmDetails() {
     this._onViewChange();
+    document.querySelector(`body`).classList.add(`hide-overflow`);
     this._filmDetailsComponent = new FilmDetailsModal(this._film, this._api);
     const siteBodyElement = document.querySelector(`body`);
     render(siteBodyElement, this._filmDetailsComponent);
@@ -100,6 +101,7 @@ export default class FilmController {
   _closeFilmDetails() {
     remove(this._filmDetailsComponent);
     document.removeEventListener(`keydown`, this._onEscKeyDownHandler);
+    document.querySelector(`body`).classList.remove(`hide-overflow`);
   }
 
   _onEscKeyDownHandler(evt) {

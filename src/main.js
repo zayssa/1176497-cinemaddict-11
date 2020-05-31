@@ -6,7 +6,7 @@ import Store from './api/store';
 import Provider from './api/provider.js';
 import UserRank from './components/user-rank';
 import FooterStats from './components/footer-stats';
-import FilmsPage from './components/page';
+import FilmsPage from './components/films-page';
 import PageController from './controllers/page';
 import FilterController from './controllers/filter';
 import Statistics from './components/statistic';
@@ -19,7 +19,8 @@ const store = new Store(window.localStorage);
 const apiWithProvider = new Provider(api, store);
 
 const siteHeaderElement = document.querySelector(`.header`);
-render(siteHeaderElement, new UserRank());
+const headerUserRank = new UserRank();
+render(siteHeaderElement, headerUserRank);
 
 const siteMainElement = document.querySelector(`.main`);
 const filmsPage = new FilmsPage();
@@ -36,6 +37,8 @@ apiWithProvider.getFilms().then((films) => {
 
   const statistics = new Statistics(filmsModel);
   siteMenuController.addStatistic(statistics);
+  remove(headerUserRank);
+  render(siteHeaderElement, new UserRank(statistics));
 
   remove(loading);
 

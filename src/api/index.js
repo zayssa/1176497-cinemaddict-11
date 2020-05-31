@@ -63,7 +63,7 @@ const API = class {
     headers.append(`Authorization`, this._authorization);
 
     return fetch(`${API_HOST}/movies/sync`, {
-      methor: `POST`,
+      method: `POST`,
       headers,
       body: films
     });

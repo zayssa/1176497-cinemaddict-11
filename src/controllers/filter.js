@@ -41,6 +41,10 @@ export default class FilterController {
     }
   }
 
+  addStatistic(statistics) {
+    this._statistics = statistics;
+  }
+
   _onFilterChange(filterType) {
     this._activeFilterType = filterType;
     switch (filterType) {
@@ -58,9 +62,5 @@ export default class FilterController {
 
   _onDataChange() {
     this.render();
-  }
-
-  addStatistic(statistics) {
-    this._statistics = statistics;
   }
 }
